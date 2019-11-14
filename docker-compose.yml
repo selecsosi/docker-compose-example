@@ -1,0 +1,75 @@
+version: '3.5'
+services:
+  postgres:
+    hostname: postgres
+    image: postgres:11
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - internal
+  rabbit:
+    hostname: rabbit
+    image: rabbitmq:management
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - internal
+  redis:
+    image: redis
+    networks:
+      - internal
+  web:
+    image: example/web
+    build:
+      dockerfile: web.dockerfile
+      context: .
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "5000:5000"
+    volumes:
+      - logvolume01:/var/log
+    links:
+      - redis
+      - rabbit
+      - postgres
+    networks:
+      - internal
+      - default
+  worker:
+    image: example/worker
+    build:
+      dockerfile: worker.dockerfile
+      context: .
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - logvolume01:/var/log
+    links:
+      - redis
+      - rabbit
+      - postgres
+    networks:
+      - internal
+      - external # To hit S3
+volumes:
+  logvolume01: {}
+  pgdata: {}
+networks:
+  internal:
+    internal: true
+  external:
