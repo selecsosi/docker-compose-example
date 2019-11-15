@@ -27,7 +27,7 @@ services:
   web:
     image: example/web
     build:
-      dockerfile: web.dockerfile
+      dockerfile: dockerfiles/web.dockerfile
       context: .
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
@@ -46,10 +46,28 @@ services:
     networks:
       - internal
       - default
+  flower:
+    image: example/flower
+    build:
+      dockerfile: dockerfiles/flower.dockerfile
+      context: .
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "5555:5555"
+    volumes:
+      - logvolume01:/var/log
+    links:
+      - redis
+      - rabbit
+    networks:
+      - internal
+      - default
   worker:
     image: example/worker
     build:
-      dockerfile: worker.dockerfile
+      dockerfile: dockerfiles/worker.dockerfile
       context: .
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
