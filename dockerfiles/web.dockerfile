@@ -28,8 +28,6 @@ COPY ./bin /app/bin
 
 RUN chown -R root:development /app
 RUN chmod -R 770 /app
-RUN chmod +x /app/bin/setup_alembic.sh
-RUN chmod +x /app/bin/entrypoint.sh
 
 USER flask
 ENTRYPOINT ["bin/entrypoint.sh"]

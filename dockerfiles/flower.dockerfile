@@ -20,7 +20,6 @@ COPY ./example /app/example
 COPY ./bin /app/bin
 RUN chown -R root:development /app
 RUN chmod -R 770 /app
-RUN chmod +x /app/bin/entrypoint.sh
 
 #Setup fixtures dir
 
