@@ -3,7 +3,7 @@ boto3==1.10.18
 celery==4.3.0
 Flask==1.1.1
 Flask-SQLAlchemy==2.4.1
-flower==0.9.3
+flower==1.2.0
 gunicorn==20.0.0
 psycopg2==2.8.4
 python-dateutil==2.8.1
